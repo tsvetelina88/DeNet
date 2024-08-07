@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { QBtn } from "Quasar";
+import { QBtn, QCard, QCardSection } from "Quasar";
 import { ref } from "vue";
 import DockPanel from "./components/DockPanel.vue";
+import AesEncryption from "./components/AesEncryption.vue";
 
 // 1. Connecting the Metamask wallet to the site and displaying its address
 const address = ref<string | null>(null);
@@ -9,20 +10,15 @@ const address = ref<string | null>(null);
 const connectWallet = async () => {
   if (window.ethereum) {
     try {
-      // Request account access
       const accounts = await (window as any).ethereum.request({
         method: "eth_requestAccounts",
       });
-      // Set the first account as the connected address
       address.value = accounts[0];
     } catch (error) {
-      console.error(
-        "User denied account access or other error occurred:",
-        error
-      );
+      console.error("Error:", error);
     }
   } else {
-    alert("MetaMask is not installed. Please install MetaMask and try again.");
+    alert("MetaMask not found");
   }
 };
 
@@ -30,35 +26,48 @@ const connectWallet = async () => {
 const text = ref("");
 const hash = ref<string | null>(null);
 
-// Function to compute SHA-256 hash
 const getHash = async () => {
   if (text.value) {
     try {
-      // Convert text to ArrayBuffer
       const encoder = new TextEncoder();
       const data = encoder.encode(text.value);
 
-      // Compute the hash
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-      // Convert hash to hexadecimal string
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       hash.value = hashArray
         .map((byte) => byte.toString(16).padStart(2, "0"))
         .join("");
     } catch (error) {
-      console.error("Error computing hash:", error);
+      console.error("Error:", error);
     }
   } else {
     hash.value = null;
   }
 };
+
+// 3. Dock panel, with a list of applications/sites, which opens when clicked. iframe on your application page. (sites  https://app.uniswap.org/ ,  https://app.1inch.io/ , bugs.denet.pro, revert.finance, you can add something of your own)
+// DockPanel Component
+
+const applications = [
+  { name: "Uniswap", url: "https://app.uniswap.org/" },
+  { name: "1inch", url: "https://app.1inch.io/" },
+  { name: "Bugs Denet", url: "https://bugs.denet.pro" },
+  { name: "Revert Finance", url: "https://revert.finance" },
+  { name: "Google", url: "https://www.google.com" },
+];
+
+// 4. Block utility - textarea - the entered text is encrypted with the aes algorithm using a free or specified key; 5. Block utility - textarea - the entered text is decrypted by aes using a free or specified key
+// AesEncryption Component
+
+// 6. Loading a list of applications for the dock panel from a .json file (you can make it static in a free format)
+// DockPanel Component - jsonFile="/apps.json"
 </script>
 
 <template>
   <q-card class="q-col-gutter-md column">
     <q-card-section class="q-pa-none">
-      <p>MetaMask Wallet</p>
+      <p style="color: red">MetaMask Wallet</p>
       <div class="column items-center on-right btn">
         <q-btn
           color="primary"
@@ -71,7 +80,7 @@ const getHash = async () => {
       </div>
     </q-card-section>
     <q-card-section>
-      <p>SHA-256</p>
+      <p style="color: red">SHA-256</p>
       <textarea
         v-model="text"
         rows="4"
@@ -83,7 +92,14 @@ const getHash = async () => {
       <p v-if="hash">SHA-256 Hash: {{ hash }}</p>
     </q-card-section>
     <q-card-section>
-      <dock-panel />
+      <p style="color: red">Dock Panel</p>
+      <DockPanel :appList="applications" />
+    </q-card-section>
+    <q-card-section>
+      <aes-encryption />
+    </q-card-section>
+    <q-card-section>
+      <DockPanel jsonFile="/apps.json" />
     </q-card-section>
   </q-card>
 </template>
