@@ -3,6 +3,8 @@ import { QBtn, QCard, QCardSection } from "Quasar";
 import { ref } from "vue";
 import DockPanel from "./components/DockPanel.vue";
 import AesEncryption from "./components/AesEncryption.vue";
+import DisplayCurrentBalance from "./components/DisplayCurrentBalance.vue";
+import WalletTransaction from "./components/WalletTransaction.vue";
 
 // 1. Connecting the Metamask wallet to the site and displaying its address
 const address = ref<string | null>(null);
@@ -62,6 +64,13 @@ const applications = [
 
 // 6. Loading a list of applications for the dock panel from a .json file (you can make it static in a free format)
 // DockPanel Component - jsonFile="/apps.json"
+
+// 7. Display balance in Polygon network or Kovan network. Test Kovan ETH can be requested from the team or from free faucets
+// DisplayCurrentBalance Component
+
+// 8. Sending a transaction from the connected wallet of the main token
+// 9. Sending a transaction from a connected ERC20 custom token wallet
+// WalletTransaction Component
 </script>
 
 <template>
@@ -92,14 +101,24 @@ const applications = [
       <p v-if="hash">SHA-256 Hash: {{ hash }}</p>
     </q-card-section>
     <q-card-section>
-      <p style="color: red">Dock Panel</p>
+      <p style="color: red">Dock Panel with provided Array Options</p>
       <DockPanel :appList="applications" />
     </q-card-section>
     <q-card-section>
+      <p style="color: red">Encryption & Decryption</p>
       <aes-encryption />
     </q-card-section>
     <q-card-section>
+      <p style="color: red">Dock Panel with provided JSON list</p>
       <DockPanel jsonFile="/apps.json" />
+    </q-card-section>
+    <q-card-section>
+      <p style="color: red">Current Balance from MetaMask Wallet</p>
+      <DisplayCurrentBalance />
+    </q-card-section>
+    <q-card-section>
+      <p style="color: red">WalletTransaction for MetaMask Wallet</p>
+      <WalletTransaction />
     </q-card-section>
   </q-card>
 </template>
